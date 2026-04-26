@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>httk — 本当は定時で帰りたい</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+
+    :root {
+      --yellow: #FFE500;
+      --black: #0a0a0a;
+      --white: #f5f5f0;
+      --gray: #1a1a1a;
+      --gray2: #2a2a2a;
+      --gray3: #888;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ========== NAV ========== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      mix-blend-mode: difference;
+    }
+
+    .nav-logo {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    /* ========== HERO ========== */
+    #hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-text {
+      position: absolute;
+      font-size: clamp(120px, 22vw, 340px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.06);
+      user-select: none;
+      animation: drift 12s ease-in-out infinite alternate;
+      white-space: nowrap;
+    }
+
+    @keyframes drift {
+      from { transform: translateX(-3%) rotate(-1deg); }
+      to   { transform: translateX(3%) rotate(1deg); }
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+
+    .hero-title {
+      font-size: clamp(80px, 18vw, 220px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 0.9;
+      color: var(--yellow);
+      text-shadow: 0 0 80px rgba(255,229,0,0.3);
+      animation: glitch 6s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 90%, 100% { transform: none; text-shadow: 0 0 80px rgba(255,229,0,0.3); }
+      92% { transform: translateX(-3px); text-shadow: 3px 0 80px rgba(255,100,100,0.5); }
+      94% { transform: translateX(3px); text-shadow: -3px 0 80px rgba(100,100,255,0.5); }
+      96% { transform: none; text-shadow: 0 0 80px rgba(255,229,0,0.3); }
+    }
+
+    .hero-sub {
+      margin-top: 24px;
+      font-size: clamp(14px, 2vw, 18px);
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.5);
+      font-weight: 300;
+    }
+
+    .hero-sub span {
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .hero-cta {
+      margin-top: 48px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--yellow);
+      color: var(--black);
+      padding: 16px 40px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255,229,0,0.4);
+    }
+
+    .btn-outline {
+      border: 1px solid rgba(255,255,255,0.3);
+      color: var(--white);
+      padding: 16px 40px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--white);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.4;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .scroll-indicator span {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--white), transparent);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ========== TICKER ========== */
+    .ticker {
+      background: var(--yellow);
+      color: var(--black);
+      padding: 14px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      animation: ticker 18s linear infinite;
+    }
+
+    .ticker-item {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0 32px;
+    }
+
+    .ticker-sep {
+      padding: 0 8px;
+      opacity: 0.4;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ========== SECTION BASE ========== */
+    section { padding: 120px 40px; }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: clamp(36px, 5vw, 72px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    /* ========== DECODE ========== */
+    #decode {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #decode .inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .decode-left .big {
+      font-size: clamp(60px, 10vw, 130px);
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--yellow);
+      line-height: 1;
+    }
+
+    .decode-letters {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .decode-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .decode-char {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--yellow);
+      width: 32px;
+      flex-shrink: 0;
+    }
+
+    .decode-meaning {
+      font-size: 15px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.05em;
+    }
+
+    .decode-right p {
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.9;
+      color: rgba(255,255,255,0.65);
+      font-weight: 300;
+    }
+
+    .decode-right p strong {
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    /* ========== MANIFESTO ========== */
+    #manifesto {
+      background: var(--yellow);
+      color: var(--black);
+      text-align: center;
+      padding: 120px 40px;
+    }
+
+    #manifesto .manifesto-big {
+      font-size: clamp(28px, 5vw, 64px);
+      font-weight: 900;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      max-width: 900px;
+      margin: 0 auto 48px;
+    }
+
+    #manifesto .manifesto-big em {
+      font-style: normal;
+      text-decoration: underline;
+      text-underline-offset: 6px;
+    }
+
+    #manifesto .manifesto-sub {
+      font-size: clamp(14px, 1.8vw, 18px);
+      line-height: 2;
+      color: rgba(0,0,0,0.6);
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    /* ========== PRODUCTS ========== */
+    #products {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #products .products-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 60px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .product-card {
+      background: var(--gray);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .product-card:hover { transform: translateY(-6px); }
+
+    .product-img {
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+      font-weight: 900;
+      background: var(--gray2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-img::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255,229,0,0.08), transparent 60%);
+    }
+
+    .product-img-label {
+      color: var(--yellow);
+      letter-spacing: 0.05em;
+      font-size: clamp(40px, 6vw, 80px);
+    }
+
+    .product-info {
+      padding: 20px 24px;
+    }
+
+    .product-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .product-desc {
+      font-size: 12px;
+      color: var(--gray3);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .product-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--yellow);
+    }
+
+    .product-badge {
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--black);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      padding: 4px 8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* ========== MISSION ========== */
+    #mission {
+      border-top: 1px solid var(--gray2);
+      border-bottom: 1px solid var(--gray2);
+    }
+
+    #mission .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .mission-stat {
+      margin-top: 48px;
+    }
+
+    .stat-number {
+      font-size: clamp(60px, 8vw, 100px);
+      font-weight: 900;
+      color: var(--yellow);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--gray3);
+      margin-top: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .mission-right p {
+      font-size: clamp(15px, 1.8vw, 18px);
+      line-height: 2;
+      color: rgba(255,255,255,0.6);
+      font-weight: 300;
+    }
+
+    .mission-right p + p { margin-top: 20px; }
+    .mission-right strong { color: var(--white); font-weight: 600; }
+
+    .mission-list {
+      margin-top: 40px;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .mission-list li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .mission-list li::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--yellow);
+      flex-shrink: 0;
+    }
+
+    /* ========== COMMUNITY ========== */
+    #community {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    #community .community-emoji {
+      font-size: 64px;
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    #community p {
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 2;
+      color: rgba(255,255,255,0.6);
+      margin-top: 24px;
+      font-weight: 300;
+    }
+
+    .hashtag {
+      display: inline-block;
+      margin-top: 32px;
+      font-size: clamp(22px, 3vw, 36px);
+      font-weight: 700;
+      color: var(--yellow);
+      letter-spacing: 0.05em;
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      border-top: 1px solid var(--gray2);
+      padding: 60px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--yellow);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-tagline {
+      font-size: 12px;
+      color: var(--gray3);
+      margin-top: 4px;
+      letter-spacing: 0.1em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--gray3);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--white); }
+
+    .footer-copy {
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.05em;
+    }
+
+    /* ========== ANIMATIONS ========== */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      section { padding: 80px 20px; }
+
+      #decode .inner,
+      #mission .inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .products-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #products .products-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 40px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
+      .hero-cta { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">httk</a>
+  <ul class="nav-links">
+    <li><a href="#decode">暗号解読</a></li>
+    <li><a href="#products">アイテム</a></li>
+    <li><a href="#mission">ミッション</a></li>
+    <li><a href="#community">仲間</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-text">httk</div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">secret code for office workers</p>
+    <h1 class="hero-title">httk</h1>
+    <p class="hero-sub">
+      <span>本当は定時で帰りたい</span>
+      — でも言えない、全員の本音
+    </p>
+    <div class="hero-cta">
+      <a href="#products" class="btn-primary">アイテムを見る</a>
+      <a href="#decode" class="btn-outline">暗号を解読する</a>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    <span>scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker-inner">
+    <span class="ticker-item">httk</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">本当は定時で帰りたい</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">みんなで帰れば恐くない</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">定時退社は権利だ</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">httk</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">今日も定時で帰ろう</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">no overtime no life</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">httk</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">本当は定時で帰りたい</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">みんなで帰れば恐くない</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">定時退社は権利だ</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">httk</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">今日も定時で帰ろう</span><span class="ticker-sep">✦</span>
+    <span class="ticker-item">no overtime no life</span><span class="ticker-sep">✦</span>
+  </div>
+</div>
+
+<!-- DECODE -->
+<section>
+  <div id="decode">
+    <div class="inner">
+      <div class="decode-left fade-up">
+        <div class="big">httk</div>
+        <div class="decode-letters">
+          <div class="decode-row">
+            <span class="decode-char">h</span>
+            <span class="decode-meaning">本当は <em style="color:rgba(255,255,255,0.4);font-style:normal;">— hontou wa</em></span>
+          </div>
+          <div class="decode-row">
+            <span class="decode-char">t</span>
+            <span class="decode-meaning">定時で <em style="color:rgba(255,255,255,0.4);font-style:normal;">— teiji de</em></span>
+          </div>
+          <div class="decode-row">
+            <span class="decode-char">t</span>
+            <span class="decode-meaning">退社して <em style="color:rgba(255,255,255,0.4);font-style:normal;">— taisha shite</em></span>
+          </div>
+          <div class="decode-row">
+            <span class="decode-char">k</span>
+            <span class="decode-meaning">帰りたい <em style="color:rgba(255,255,255,0.4);font-style:normal;">— kaeritai</em></span>
+          </div>
+        </div>
+      </div>
+      <div class="decode-right fade-up" style="transition-delay: 0.2s;">
+        <p class="section-label">about httk</p>
+        <h2 class="section-title" style="margin-bottom:32px;">誰もが持つ<br>言えない本音</h2>
+        <p>
+          「今日、定時で帰っていいですか？」<br>
+          <strong>なんでこんな一言が言いづらいんだろう。</strong>
+        </p>
+        <p style="margin-top:20px;">
+          httkは、そんな本音を持つすべての会社員のための暗号だ。
+          Tシャツのプリントにあるこのロゴを見て、ニヤッとする。
+          キーホルダーを持つ人を見て、目で語り合う。
+          <strong>言葉にしなくても伝わる、同志の証。</strong>
+        </p>
+        <p style="margin-top:20px;">
+          みんなで帰れば恐くない。
+          一人じゃないとわかれば、<strong>今日から少しだけ、帰りやすくなる。</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section id="manifesto">
+  <p class="manifesto-big fade-up">
+    定時退社は<em>さぼりじゃない</em>。<br>
+    それは<em>権利</em>であり、<br>
+    <em>賢さ</em>の証明だ。
+  </p>
+  <p class="manifesto-sub fade-up" style="transition-delay:0.2s;">
+    残業が美徳とされてきた時代は終わった。<br>
+    httkを身につけることは、新しい働き方への小さな、でも確かな宣言。<br>
+    今日も、胸を張って帰ろう。
+  </p>
+  <div class="fade-up" style="margin-top:48px;transition-delay:0.3s;">
+    <a href="#products" class="btn-primary">今すぐ宣言する</a>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section>
+  <div id="products">
+    <div class="products-header fade-up">
+      <div>
+        <p class="section-label">items</p>
+        <h2 class="section-title">同志の証を<br>身につけろ</h2>
+      </div>
+      <a href="#community" class="btn-outline" style="white-space:nowrap;">全アイテムを見る</a>
+    </div>
+
+    <div class="products-grid" id="products-grid">
+      <!-- Sanityから動的に読み込まれます -->
+      <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--gray3);">読み込み中...</div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section id="mission">
+  <div class="inner">
+    <div class="fade-up">
+      <p class="section-label">our mission</p>
+      <h2 class="section-title">みんなで帰れば<br>恐くない</h2>
+      <div class="mission-stat">
+        <div class="stat-number">6:00</div>
+        <div class="stat-label">それが、本当の定時退社時刻</div>
+      </div>
+    </div>
+    <div class="mission-right fade-up" style="transition-delay:0.2s;">
+      <p>
+        日本の会社員の多くが、<strong>定時で帰ることに罪悪感を感じている。</strong>
+        空気を読んで残る。なんとなく帰りづらい。
+        そんな文化、もう変えていこう。
+      </p>
+      <p>
+        httkは「商品を売るブランド」じゃない。
+        <strong>同じ思いを持つ人たちをつなぐ、ムーブメントだ。</strong>
+      </p>
+      <ul class="mission-list">
+        <li>定時退社を、ポジティブに再定義する</li>
+        <li>「帰る勇気」を持つ人を増やす</li>
+        <li>残業美徳文化に、ファッションで抵抗する</li>
+        <li>同じ価値観の人が出会える場をつくる</li>
+        <li>ウェルビーイングな働き方の当たり前化</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section>
+  <div id="community">
+    <span class="community-emoji fade-up">✊</span>
+    <p class="section-label fade-up">community</p>
+    <h2 class="section-title fade-up" style="transition-delay:0.1s;">
+      一人じゃない。<br>仲間がいる。
+    </h2>
+    <p class="fade-up" style="transition-delay:0.2s;">
+      httkを身につけた人が増えれば増えるほど、<br>
+      「今日、帰ります」が言いやすくなる。<br>
+      それだけで世界は少し、変わっていく。
+    </p>
+    <div class="hashtag fade-up" style="transition-delay:0.3s;">#httk</div>
+    <div class="fade-up" style="margin-top:40px;transition-delay:0.4s;">
+      <a href="#products" class="btn-primary">今日から仲間になる</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">httk</div>
+    <div class="footer-tagline">本当は定時で帰りたい — みんなで帰れば恐くない</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#">Instagram</a></li>
+    <li><a href="#">X (Twitter)</a></li>
+    <li><a href="#">お問い合わせ</a></li>
+    <li><a href="#">特定商取引法</a></li>
+  </ul>
+  <p class="footer-copy">© 2026 httk. All rights reserved.</p>
+</footer>
+
+<script type="module">
+  const PROJECT_ID = '7koiff0v';
+  const DATASET = 'production';
+
+  function sanityFetch(query) {
+    const url = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${encodeURIComponent(query)}`;
+    return fetch(url).then(r => r.json()).then(d => d.result);
+  }
+
+  // Scroll fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  function observeAll() {
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  }
+  observeAll();
+
+  // ========== サイト設定 ==========
+  sanityFetch('*[_type == "siteSettings"][0]').then(s => {
+    if (!s) return;
+    if (s.heroEyebrow) document.querySelector('.hero-eyebrow').textContent = s.heroEyebrow;
+    if (s.heroSub) document.querySelector('.hero-sub span').textContent = s.heroSub;
+    if (s.heroSubSuffix) {
+      const sub = document.querySelector('.hero-sub');
+      sub.childNodes[1].textContent = ' ' + s.heroSubSuffix;
+    }
+    if (s.heroCta1) document.querySelector('.hero-cta .btn-primary').textContent = s.heroCta1;
+    if (s.heroCta2) document.querySelector('.hero-cta .btn-outline').textContent = s.heroCta2;
+    if (s.footerTagline) document.querySelector('.footer-tagline').textContent = s.footerTagline;
+    if (s.ticker && s.ticker.length > 0) {
+      const items = s.ticker.map(t =>
+        `<span class="ticker-item">${t}</span><span class="ticker-sep">✦</span>`
+      ).join('');
+      const tickerEl = document.getElementById('ticker-inner');
+      tickerEl.innerHTML = items + items;
+    } else {
+      const ticker = document.getElementById('ticker-inner');
+      ticker.innerHTML += ticker.innerHTML;
+    }
+  }).catch(() => {
+    const ticker = document.getElementById('ticker-inner');
+    ticker.innerHTML += ticker.innerHTML;
+  });
+
+  // ========== マニフェスト ==========
+  sanityFetch('*[_type == "manifesto"][0]').then(m => {
+    if (!m) return;
+    if (m.mainText) {
+      const words = m.underlineWords || [];
+      let html = m.mainText.replace(/\n/g, '<br>');
+      words.forEach(w => {
+        html = html.replace(new RegExp(w, 'g'), `<em>${w}</em>`);
+      });
+      document.querySelector('.manifesto-big').innerHTML = html;
+    }
+    if (m.subText) {
+      document.querySelector('.manifesto-sub').innerHTML = m.subText.replace(/\n/g, '<br>');
+    }
+    if (m.ctaText) {
+      document.querySelector('#manifesto .btn-primary').textContent = m.ctaText;
+    }
+  });
+
+  // ========== ミッション ==========
+  sanityFetch('*[_type == "mission"][0]').then(m => {
+    if (!m) return;
+    if (m.statNumber) document.querySelector('.stat-number').textContent = m.statNumber;
+    if (m.statLabel) document.querySelector('.stat-label').textContent = m.statLabel;
+    if (m.bodyText && m.bodyText.length > 0) {
+      const right = document.querySelector('.mission-right');
+      right.querySelectorAll('p').forEach(p => p.remove());
+      m.bodyText.forEach(text => {
+        const p = document.createElement('p');
+        p.innerHTML = text.replace(/\n/g, '<br>');
+        right.insertBefore(p, right.querySelector('.mission-list'));
+      });
+    }
+    if (m.listItems && m.listItems.length > 0) {
+      const list = document.querySelector('.mission-list');
+      list.innerHTML = m.listItems.map(item => `<li>${item}</li>`).join('');
+    }
+  });
+
+  // ========== 商品 ==========
+  function renderProducts(products) {
+    const grid = document.getElementById('products-grid');
+    if (!products || products.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--gray3);">商品は準備中です</div>';
+      return;
+    }
+    grid.innerHTML = products.map((p, i) => {
+      const delay = (i * 0.1).toFixed(1);
+      const badge = p.badge ? `<span class="product-badge">${p.badge}</span>` : '';
+      const imgContent = p.emoji
+        ? `<span style="font-size:56px;">${p.emoji}</span>`
+        : `<span class="product-img-label">httk</span>`;
+      return `
+        <div class="product-card fade-up" style="transition-delay:${delay}s;">
+          <div class="product-img">${imgContent}</div>
+          <div class="product-info">
+            ${badge}
+            <p class="product-name">${p.name}</p>
+            <p class="product-desc">${(p.description || '').replace(/\n/g, '<br>')}</p>
+            <p class="product-price">¥${p.price.toLocaleString()}</p>
+          </div>
+        </div>`;
+    }).join('');
+    grid.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  }
+
+  sanityFetch('*[_type == "product" && isVisible == true] | order(order asc)')
+    .then(data => renderProducts(data))
+    .catch(() => {
+      renderProducts([
+        { name: 'httk ロゴ Tシャツ', description: '胸元に小さくhttk。\n知る人ぞ知る、静かな連帯。', price: 4800, badge: 'bestseller', emoji: '' },
+        { name: '定時退社宣言 Tシャツ', description: 'バックに大きく「本当は定時で帰りたい」\n分かる人だけ分かる文字組み。', price: 5200, badge: 'new', emoji: 'h.t.t.k' },
+        { name: 'httk キーホルダー', description: 'カバンにつけて静かにアピール。\n気づいた人と目が合えばそれだけで仲間。', price: 1200, badge: 'popular', emoji: '🔑' },
+        { name: 'httk キャップ', description: '通勤路でそっとhttk。\nローブリムで大人もかぶれる一枚。', price: 4200, badge: '', emoji: '🧢' },
+        { name: 'httk トートバッグ', description: '毎日の通勤バッグに忍ばせるメッセージ。\n容量もたっぷりで実用的。', price: 2800, badge: '', emoji: '🛍️' },
+        { name: 'httk ステッカーセット', description: 'PC・手帳・水筒に貼って\n小さく静かに意思表示。5枚セット。', price: 600, badge: 'limited', emoji: '📌' },
+      ]);
+    });
+</script>
+</body>
+</html>
