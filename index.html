@@ -862,7 +862,14 @@
   // ========== サイト設定 ==========
   sanityFetch('*[_type == "siteSettings"][0]').then(s => {
     if (!s) return;
+    // ナビ
+    if (s.navLogo) document.querySelector('.nav-logo').textContent = s.navLogo;
+    // ヒーロー
     if (s.heroEyebrow) document.querySelector('.hero-eyebrow').textContent = s.heroEyebrow;
+    if (s.heroTitle) {
+      document.querySelector('.hero-title').textContent = s.heroTitle;
+      document.querySelector('.hero-bg-text').textContent = s.heroTitle;
+    }
     if (s.heroSub) document.querySelector('.hero-sub span').textContent = s.heroSub;
     if (s.heroSubSuffix) {
       const sub = document.querySelector('.hero-sub');
@@ -870,7 +877,7 @@
     }
     if (s.heroCta1) document.querySelector('.hero-cta .btn-primary').textContent = s.heroCta1;
     if (s.heroCta2) document.querySelector('.hero-cta .btn-outline').textContent = s.heroCta2;
-    if (s.footerTagline) document.querySelector('.footer-tagline').textContent = s.footerTagline;
+    // ティッカー
     if (s.ticker && s.ticker.length > 0) {
       const items = s.ticker.map(t =>
         `<span class="ticker-item">${t}</span><span class="ticker-sep">✦</span>`
@@ -881,9 +888,48 @@
       const ticker = document.getElementById('ticker-inner');
       ticker.innerHTML += ticker.innerHTML;
     }
+    // 商品セクション
+    if (s.productsSectionLabel) document.querySelector('#products .section-label').textContent = s.productsSectionLabel;
+    if (s.productsSectionTitle) document.querySelector('#products .section-title').innerHTML = s.productsSectionTitle.replace(/\\n/g, '<br>');
+    if (s.productsCtaText) document.querySelector('#products .btn-outline').textContent = s.productsCtaText;
+    // コミュニティ
+    if (s.communityEmoji) document.querySelector('.community-emoji').textContent = s.communityEmoji;
+    if (s.communityTitle) document.querySelector('#community .section-title').innerHTML = s.communityTitle.replace(/\\n/g, '<br>');
+    if (s.communityBody) document.querySelector('#community > p').innerHTML = s.communityBody.replace(/\n/g, '<br>');
+    if (s.communityHashtag) document.querySelector('.hashtag').textContent = s.communityHashtag;
+    if (s.communityCta) document.querySelector('#community .btn-primary').textContent = s.communityCta;
+    // フッター
+    if (s.footerLogo) document.querySelector('.footer-logo').textContent = s.footerLogo;
+    if (s.footerTagline) document.querySelector('.footer-tagline').textContent = s.footerTagline;
+    if (s.footerCopyright) document.querySelector('.footer-copy').textContent = s.footerCopyright;
   }).catch(() => {
     const ticker = document.getElementById('ticker-inner');
     ticker.innerHTML += ticker.innerHTML;
+  });
+
+  // ========== httk解読セクション ==========
+  sanityFetch('*[_type == "decode"][0]').then(d => {
+    if (!d) return;
+    if (d.letters && d.letters.length > 0) {
+      const container = document.querySelector('.decode-letters');
+      container.innerHTML = d.letters.map(l => `
+        <div class="decode-row">
+          <span class="decode-char">${l.char}</span>
+          <span class="decode-meaning">${l.reading} <em style="color:rgba(255,255,255,0.4);font-style:normal;">— ${l.romaji}</em></span>
+        </div>`).join('');
+    }
+    if (d.sectionTitle) {
+      document.querySelector('.decode-right .section-title').innerHTML = d.sectionTitle.replace(/\n/g, '<br>');
+    }
+    if (d.bodyText && d.bodyText.length > 0) {
+      const right = document.querySelector('.decode-right');
+      right.querySelectorAll('p:not(.section-label):not(.section-title)').forEach(p => p.remove());
+      d.bodyText.forEach(text => {
+        const p = document.createElement('p');
+        p.innerHTML = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+        right.appendChild(p);
+      });
+    }
   });
 
   // ========== マニフェスト ==========
