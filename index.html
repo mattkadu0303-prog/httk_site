@@ -997,9 +997,14 @@
     grid.innerHTML = products.map((p, i) => {
       const delay = (i * 0.1).toFixed(1);
       const badge = p.badge ? `<span class="product-badge">${p.badge}</span>` : '';
-      const imgContent = p.emoji
-        ? `<span style="font-size:56px;">${p.emoji}</span>`
-        : `<span class="product-img-label">httk</span>`;
+      let imgContent;
+      if (p.imageUrl) {
+        imgContent = `<img src="${p.imageUrl}?w=600&auto=format" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`;
+      } else if (p.emoji) {
+        imgContent = `<span style="font-size:56px;">${p.emoji}</span>`;
+      } else {
+        imgContent = `<span class="product-img-label">httk</span>`;
+      }
       const buyBtn = p.storesUrl
         ? `<a class="product-buy" href="${p.storesUrl}" target="_blank" rel="noopener">購入する →</a>`
         : '';
@@ -1019,7 +1024,7 @@
     grid.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
   }
 
-  sanityFetch('*[_type == "product" && isVisible == true] | order(order asc)')
+  sanityFetch('*[_type == "product" && isVisible == true] | order(order asc) { ..., "imageUrl": image.asset->url }')
     .then(data => renderProducts(data))
     .catch(() => {
       renderProducts([

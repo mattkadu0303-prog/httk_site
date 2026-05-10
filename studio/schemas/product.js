@@ -22,10 +22,17 @@ export default {
       validation: Rule => Rule.required().min(0),
     },
     {
+      name: 'image',
+      title: '商品画像',
+      type: 'image',
+      options: { hotspot: true },
+      description: '画像をアップロードしてください（画像がない場合は絵文字が表示されます）',
+    },
+    {
       name: 'emoji',
-      title: '絵文字アイコン',
+      title: '絵文字アイコン（画像なしの場合）',
       type: 'string',
-      description: '例: 👕 🔑 🧢（Tシャツはhttk文字表示のため空欄でOK）',
+      description: '例: 👕 🔑 🧢（画像をアップロードした場合は不要）',
     },
     {
       name: 'badge',
