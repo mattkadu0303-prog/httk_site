@@ -48,6 +48,12 @@ export default {
       description: '小さい数字が先に表示されます',
     },
     {
+      name: 'storesUrl',
+      title: 'STORESの商品URL',
+      type: 'url',
+      description: '例: https://mkmkmkzika.com/items/xxxxxx',
+    },
+    {
       name: 'isVisible',
       title: '公開する',
       type: 'boolean',
